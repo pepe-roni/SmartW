@@ -5,13 +5,13 @@
 // MIT license
 
 #if defined(__SAM3X8E__)
-	#include <include/pio.h>
+    #include <include/pio.h>
     #define PROGMEM
     #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
     #define pgm_read_word(addr) (*(const unsigned short *)(addr))
 #endif
 #ifdef __AVR__
-	#include <avr/pgmspace.h>
+    #include <avr/pgmspace.h>
 #endif
 #include "pins_arduino.h"
 #include "wiring_private.h"
@@ -28,7 +28,7 @@
 #define ID_932X    0
 #define ID_7575    1
 #define ID_9341    2
-#define ID_HX8357D    3
+#define ID_HX8357D 3
 #define ID_UNKNOWN 0xFF
 
 #include "registers.h"
@@ -355,6 +355,7 @@ void Adafruit_TFTLCD::reset(void) {
   delay(2);
   digitalWrite(5, HIGH);
 #else
+  // if we have a reset pin defined ( _reset )
   if(_reset) {
     digitalWrite(_reset, LOW);
     delay(2);
@@ -368,6 +369,10 @@ void Adafruit_TFTLCD::reset(void) {
   write8(0x00);
   for(uint8_t i=0; i<3; i++) WR_STROBE; // Three extra 0x00s
   CS_IDLE;
+
+  // let the display recover from the reset
+  delay(500);
+
 }
 
 // Sets the LCD address window (and address counter, on 932X).
@@ -882,6 +887,18 @@ uint16_t Adafruit_TFTLCD::readID(void) {
   }
   */
 
+  // caryg
+  // somehow executing this debug code causes
+  // us to correctly read 0x9341 below.
+  // some sort of timing issue?
+  // at least one of the Serial.print s below
+  // needs to execute then we read 0x9341
+  //uint16_t foo = readReg(0x04);
+  //Serial.print("Foo ");
+  //Serial.println(foo, HEX);
+
+  //delay(1000);
+
   if (readReg(0x04) == 0x8000) { // eh close enough
     // setc!
     /*
@@ -893,7 +910,6 @@ uint16_t Adafruit_TFTLCD::readID(void) {
     */
     writeRegister24(HX8357D_SETC, 0xFF8357);
     delay(300);
-    //Serial.println(readReg(0xD0), HEX);
     if (readReg(0xD0) == 0x990000) {
       return 0x8357;
     }
