@@ -7,8 +7,8 @@
 #include <TouchScreen.h>
 
 #if defined(__SAM3X8E__)
-    #undef __FlashStringHelper::F(string_literal)
-    #define F(string_literal) string_literal
+#undef __FlashStringHelper::F(string_literal)
+#define F(string_literal) string_literal
 #endif
 
 // When using the BREAKOUT BOARD only, use these 8 data lines to the LCD:
@@ -49,11 +49,11 @@
 #define YM 9   // can be a digital pin
 #define XP 8   // can be a digital pin
 
-#define TS_MINX 150
-#define TS_MINY 120
-#define TS_MAXX 920
-#define TS_MAXY 940
 
+#define TS_MINX 230
+#define TS_MAXX 900
+#define TS_MINY 100
+#define TS_MAXY 900
 // For better pressure precision, we need to know the resistance
 // between X+ and X- Use any multimeter to read it
 // For the one we're using, its 300 ohms across the X plate
@@ -86,20 +86,20 @@ int oldcolor, currentcolor;
 void setup(void) {
   Serial.begin(9600);
   Serial.println(F("Paint!"));
-  
+
   tft.reset();
-  
+
   uint16_t identifier = tft.readID();
 
-  if(identifier == 0x9325) {
+  if (identifier == 0x9325) {
     Serial.println(F("Found ILI9325 LCD driver"));
-  } else if(identifier == 0x9328) {
+  } else if (identifier == 0x9328) {
     Serial.println(F("Found ILI9328 LCD driver"));
-  } else if(identifier == 0x7575) {
+  } else if (identifier == 0x7575) {
     Serial.println(F("Found HX8347G LCD driver"));
-  } else if(identifier == 0x9341) {
+  } else if (identifier == 0x9341) {
     Serial.println(F("Found ILI9341 LCD driver"));
-  } else if(identifier == 0x8357) {
+  } else if (identifier == 0x8357) {
     Serial.println(F("Found HX8357D LCD driver"));
   } else {
     Serial.print(F("Unknown LCD driver chip: "));
@@ -119,15 +119,15 @@ void setup(void) {
 
   tft.fillRect(0, 0, BOXSIZE, BOXSIZE, RED);
   tft.fillRect(BOXSIZE, 0, BOXSIZE, BOXSIZE, YELLOW);
-  tft.fillRect(BOXSIZE*2, 0, BOXSIZE, BOXSIZE, GREEN);
-  tft.fillRect(BOXSIZE*3, 0, BOXSIZE, BOXSIZE, CYAN);
-  tft.fillRect(BOXSIZE*4, 0, BOXSIZE, BOXSIZE, BLUE);
-  tft.fillRect(BOXSIZE*5, 0, BOXSIZE, BOXSIZE, MAGENTA);
+  tft.fillRect(BOXSIZE * 2, 0, BOXSIZE, BOXSIZE, GREEN);
+  tft.fillRect(BOXSIZE * 3, 0, BOXSIZE, BOXSIZE, CYAN);
+  tft.fillRect(BOXSIZE * 4, 0, BOXSIZE, BOXSIZE, BLUE);
+  tft.fillRect(BOXSIZE * 5, 0, BOXSIZE, BOXSIZE, MAGENTA);
   // tft.fillRect(BOXSIZE*6, 0, BOXSIZE, BOXSIZE, WHITE);
- 
+
   tft.drawRect(0, 0, BOXSIZE, BOXSIZE, WHITE);
   currentcolor = RED;
- 
+
   pinMode(13, OUTPUT);
 }
 
@@ -151,57 +151,57 @@ void loop()
 
   if (p.z > MINPRESSURE && p.z < MAXPRESSURE) {
     /*
-    Serial.print("X = "); Serial.print(p.x);
-    Serial.print("\tY = "); Serial.print(p.y);
-    Serial.print("\tPressure = "); Serial.println(p.z);
+      Serial.print("X = "); Serial.print(p.x);
+      Serial.print("\tY = "); Serial.print(p.y);
+      Serial.print("\tPressure = "); Serial.println(p.z);
     */
-    
-    if (p.y < (TS_MINY-5)) {
+
+    if (p.y < (TS_MINY - 5)) {
       Serial.println("erase");
-      // press the bottom of the screen to erase 
-      tft.fillRect(0, BOXSIZE, tft.width(), tft.height()-BOXSIZE, BLACK);
+      // press the bottom of the screen to erase
+      tft.fillRect(0, BOXSIZE, tft.width(), tft.height() - BOXSIZE, BLACK);
     }
     // scale from 0->1023 to tft.width
-    p.x = map(p.x, TS_MINX, TS_MAXX, tft.width(), 0);
+    p.x = map(p.x, TS_MINX, TS_MAXX,0, tft.width());
     p.y = map(p.y, TS_MINY, TS_MAXY, tft.height(), 0);
     /*
-    Serial.print("("); Serial.print(p.x);
-    Serial.print(", "); Serial.print(p.y);
-    Serial.println(")");
+      Serial.print("("); Serial.print(p.x);
+      Serial.print(", "); Serial.print(p.y);
+      Serial.println(")");
     */
     if (p.y < BOXSIZE) {
-       oldcolor = currentcolor;
+      oldcolor = currentcolor;
 
-       if (p.x < BOXSIZE) { 
-         currentcolor = RED; 
-         tft.drawRect(0, 0, BOXSIZE, BOXSIZE, WHITE);
-       } else if (p.x < BOXSIZE*2) {
-         currentcolor = YELLOW;
-         tft.drawRect(BOXSIZE, 0, BOXSIZE, BOXSIZE, WHITE);
-       } else if (p.x < BOXSIZE*3) {
-         currentcolor = GREEN;
-         tft.drawRect(BOXSIZE*2, 0, BOXSIZE, BOXSIZE, WHITE);
-       } else if (p.x < BOXSIZE*4) {
-         currentcolor = CYAN;
-         tft.drawRect(BOXSIZE*3, 0, BOXSIZE, BOXSIZE, WHITE);
-       } else if (p.x < BOXSIZE*5) {
-         currentcolor = BLUE;
-         tft.drawRect(BOXSIZE*4, 0, BOXSIZE, BOXSIZE, WHITE);
-       } else if (p.x < BOXSIZE*6) {
-         currentcolor = MAGENTA;
-         tft.drawRect(BOXSIZE*5, 0, BOXSIZE, BOXSIZE, WHITE);
-       }
+      if (p.x < BOXSIZE) {
+        currentcolor = RED;
+        tft.drawRect(0, 0, BOXSIZE, BOXSIZE, WHITE);
+      } else if (p.x < BOXSIZE * 2) {
+        currentcolor = YELLOW;
+        tft.drawRect(BOXSIZE, 0, BOXSIZE, BOXSIZE, WHITE);
+      } else if (p.x < BOXSIZE * 3) {
+        currentcolor = GREEN;
+        tft.drawRect(BOXSIZE * 2, 0, BOXSIZE, BOXSIZE, WHITE);
+      } else if (p.x < BOXSIZE * 4) {
+        currentcolor = CYAN;
+        tft.drawRect(BOXSIZE * 3, 0, BOXSIZE, BOXSIZE, WHITE);
+      } else if (p.x < BOXSIZE * 5) {
+        currentcolor = BLUE;
+        tft.drawRect(BOXSIZE * 4, 0, BOXSIZE, BOXSIZE, WHITE);
+      } else if (p.x < BOXSIZE * 6) {
+        currentcolor = MAGENTA;
+        tft.drawRect(BOXSIZE * 5, 0, BOXSIZE, BOXSIZE, WHITE);
+      }
 
-       if (oldcolor != currentcolor) {
-          if (oldcolor == RED) tft.fillRect(0, 0, BOXSIZE, BOXSIZE, RED);
-          if (oldcolor == YELLOW) tft.fillRect(BOXSIZE, 0, BOXSIZE, BOXSIZE, YELLOW);
-          if (oldcolor == GREEN) tft.fillRect(BOXSIZE*2, 0, BOXSIZE, BOXSIZE, GREEN);
-          if (oldcolor == CYAN) tft.fillRect(BOXSIZE*3, 0, BOXSIZE, BOXSIZE, CYAN);
-          if (oldcolor == BLUE) tft.fillRect(BOXSIZE*4, 0, BOXSIZE, BOXSIZE, BLUE);
-          if (oldcolor == MAGENTA) tft.fillRect(BOXSIZE*5, 0, BOXSIZE, BOXSIZE, MAGENTA);
-       }
+      if (oldcolor != currentcolor) {
+        if (oldcolor == RED) tft.fillRect(0, 0, BOXSIZE, BOXSIZE, RED);
+        if (oldcolor == YELLOW) tft.fillRect(BOXSIZE, 0, BOXSIZE, BOXSIZE, YELLOW);
+        if (oldcolor == GREEN) tft.fillRect(BOXSIZE * 2, 0, BOXSIZE, BOXSIZE, GREEN);
+        if (oldcolor == CYAN) tft.fillRect(BOXSIZE * 3, 0, BOXSIZE, BOXSIZE, CYAN);
+        if (oldcolor == BLUE) tft.fillRect(BOXSIZE * 4, 0, BOXSIZE, BOXSIZE, BLUE);
+        if (oldcolor == MAGENTA) tft.fillRect(BOXSIZE * 5, 0, BOXSIZE, BOXSIZE, MAGENTA);
+      }
     }
-    if (((p.y-PENRADIUS) > BOXSIZE) && ((p.y+PENRADIUS) < tft.height())) {
+    if (((p.y - PENRADIUS) > BOXSIZE) && ((p.y + PENRADIUS) < tft.height())) {
       tft.fillCircle(p.x, p.y, PENRADIUS, currentcolor);
     }
   }
